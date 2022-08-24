@@ -181,13 +181,15 @@ def parse(source: Union[str, bytes],
     if options is None:
         options = Options()
     errors.set_file(fnam, module)
-    is_stub_file = fnam.endswith('.pyi')
-    try:
-        if is_stub_file:
-            feature_version = defaults.PYTHON3_VERSION[1]
-        else:
-            assert options.python_version[0] >= 3
+    is_stub_file = fnam.endswith(".pyi")
+    if is_stub_file:
+        feature_version = defaults.PYTHON3_VERSION[1]
+        if options.python_version[0] == 3 and options.python_version[1] > feature_version:
             feature_version = options.python_version[1]
+    else:
+        assert options.python_version[0] >= 3
+        feature_version = options.python_version[1]
+    try:
         # Disable deprecation warnings about \u
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
